@@ -2,7 +2,11 @@ const db = require('../db/queries');
 
 async function getUsernames(req, res) {
   const usernames = await db.getAllUsernames();
-  console.log('Usernames: ', usernames);
+  if (req.query.search) {
+    const searchWord = req.query.search;
+    const filteredUsernames = await db.search(searchWord);
+    return res.render('index', { usernames: filteredUsernames });
+  }
   res.render('index', { usernames });
 }
 
@@ -16,8 +20,14 @@ async function createUsernamePost(req, res) {
   res.redirect('/');
 }
 
+async function deleteAllUsernames(req, res) {
+  await db.deleteAll();
+  res.redirect('/');
+}
+
 module.exports = {
   getUsernames,
   createUsernameGet,
   createUsernamePost,
+  deleteAllUsernames,
 };
